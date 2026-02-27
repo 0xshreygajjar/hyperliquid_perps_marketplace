@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
     SubscriptionClient,
     InfoClient,
@@ -10,8 +10,8 @@ import {
 } from "@nktkas/hyperliquid";
 import TradingViewChart from "./TradingViewChart";
 import OrderPanel from "./OrderPanel";
+import AccountDetails from "./AccountDetails";
 
-// Define Trade interface locally
 type TradeData = TradesWsEvent[0];
 
 interface ISubscription {
@@ -26,6 +26,7 @@ export default function Dashboard() {
     const [isConnected, setIsConnected] = useState(false);
     const [client, setClient] = useState<SubscriptionClient | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [userAddress, setUserAddress] = useState<string>("");
 
     // 1. Initialize Connection and Fetch Metadata
     useEffect(() => {
@@ -62,6 +63,7 @@ export default function Dashboard() {
     }, []);
 
     // 2. Manage Subscriptions when selectedCoin or client changes
+
     useEffect(() => {
         if (!client || !isConnected) return;
 
@@ -168,7 +170,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {/* Order Book Panel */}
                 <div className="bg-neutral-800 rounded-lg p-4 shadow-lg border border-gray-700">
                     <h2 className="text-lg font-semibold mb-4 text-white border-b border-gray-700 pb-2">Order Book ({selectedCoin})</h2>
@@ -232,6 +234,26 @@ export default function Dashboard() {
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            {/* Account Details Section */}
+            <div className="mt-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-white">Account Details</h2>
+                    <div className="flex items-center gap-2">
+                        <label className="text-xs text-gray-500 uppercase tracking-wider">Wallet Address:</label>
+                        <input
+                            type="text"
+                            value={userAddress}
+                            onChange={(e) => setUserAddress(e.target.value)}
+                            placeholder="0x..."
+                            className="bg-neutral-800 border border-gray-700 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500 w-64 transition"
+                        />
+                    </div>
+                </div>
+                <div className="h-[400px]">
+                    <AccountDetails address={userAddress} />
                 </div>
             </div>
         </div>
